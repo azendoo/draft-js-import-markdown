@@ -237,22 +237,10 @@ Lexer.prototype.token = function(src, top, bq) {
     // blockquote
     if ((cap = this.rules.blockquote.exec(src))) {
       src = src.substring(cap[0].length);
-
       this.tokens.push({
-        type: 'blockquote_start',
+        type: 'blockquote',
+        text: cap[0].replace(/^ *> ?/gm, '')
       });
-
-      cap = cap[0].replace(/^ *> ?/gm, '');
-
-      // Pass `top` to keep the current
-      // "toplevel" state. This is exactly
-      // how markdown.pl works.
-      this.token(cap, top, true);
-
-      this.tokens.push({
-        type: 'blockquote_end',
-      });
-
       continue;
     }
 
@@ -778,14 +766,8 @@ Parser.prototype.tok = function() {
         this.token.lang
       );
     }
-    case 'blockquote_start': {
-      let body = new FragmentNode();
-
-      while (this.next().type !== 'blockquote_end') {
-        body.appendChild(this.tok());
-      }
-
-      return this.renderer.blockquote(body);
+    case 'blockquote': {
+      return this.renderer.blockquote(this.inline.parse(this.token.text));
     }
     case 'list_start': {
       let body = new FragmentNode();
