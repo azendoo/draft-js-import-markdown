@@ -5,8 +5,16 @@ import stateFromMarkdown from '../stateFromMarkdown';
 import {convertToRaw} from 'draft-js';
 
 describe('stateFromMarkdown', () => {
-  let markdown = 'Hello World';
+  it('should sanitize links ', () => {
+    let markdown = '[Clickme i am XSS 2](javascript:alert`XSS Alerted`)';
+    let contentState = stateFromMarkdown(markdown);
+    let rawContentState = convertToRaw(contentState);
+    let url = rawContentState.entityMap[0].data.url;
+    expect(url).toEqual('');
+  });
+
   it('should create content state', () => {
+    let markdown = 'Hello World';
     let contentState = stateFromMarkdown(markdown);
     let rawContentState = convertToRaw(contentState);
     let blocks = removeKeys(rawContentState.blocks);

@@ -239,7 +239,7 @@ Lexer.prototype.token = function(src, top, bq) {
       src = src.substring(cap[0].length);
       this.tokens.push({
         type: 'blockquote',
-        text: cap[0].replace(/^ *> ?/gm, '')
+        text: cap[0].replace(/^ *> ?/gm, ''),
       });
       continue;
     }
@@ -648,6 +648,10 @@ Renderer.prototype.ins = function(childNode) {
 };
 
 Renderer.prototype.link = function(href, title, childNode) {
+  /* eslint-disable no-script-url */
+  if (href.indexOf('javascript:') === 0 || href.indexOf('vbscript:') === 0 || href.indexOf('data:') === 0) {
+    href = '';
+  }
   var attributes = [
     {name: 'href', value: href},
   ];
